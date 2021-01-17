@@ -90,12 +90,12 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		margin: 2em;
+		margin: 5em 2em;
 		width: calc(100% - 6em);
 		background: #333;
 		color: #eee;
 		padding: 1em 1em .5em 1em;
-		font-size: 2.5vmax;
+		font-size: 2vmax;
 		border-radius: .2em;
 	}
 	#info p {

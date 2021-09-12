@@ -4,4 +4,6 @@ This is a simple calendar with the full year on a single page. Designed to be pr
 
 By default, the current year is used. You can override the year by supplying a `year` parameter, e.g. `/calendar.php?year=2023`.
 
+You can also switch to a weekday-aligned rendering by setting the `layout` parameter value to `aligned-weekdays`.
+
 Unabashedly written in PHP. Print it here: https://neatnik.net/calendar

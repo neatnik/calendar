@@ -125,12 +125,15 @@ $now = isset($_REQUEST['year']) ? strtotime($_REQUEST['year'].'-01-01') : time()
 $dates = array();
 $month = 1;
 $day = 1;
+// print months 1-12 unless half-year view requested
+$month_last = (isset($_REQUEST['half']) && $_REQUEST['half'] == 1) ? 6 : 12;
+$month_first = (isset($_REQUEST['half']) && $_REQUEST['half'] == 2) ? 7 : 1;
 echo '<p>'.date('Y', $now).'</p>';
 echo '<table>';
 echo '<thead>';
 echo '<tr>';
 // Add the month headings
-for($i = 1; $i <= 12; $i++) {
+for($i = $month_first; $i <= $month_last; $i++) {
 	echo '<th>'.DateTime::createFromFormat('!m', $i)->format('M').'</th>';
 }
 echo '</tr>';
@@ -164,7 +167,6 @@ while($month <= 12) {
 			// Ensure that we have a valid date
 			if($day > cal_days_in_month(CAL_GREGORIAN, $month, date('Y', $now))) {
 				$dates[$month][$x] = 0;
-				
 			}
 			else {
 				$dates[$month][$x] = $day;
@@ -177,7 +179,7 @@ while($month <= 12) {
 
 // Now produce the table
 
-$month = 1;
+$month = $month_first;
 $day = 1;
 
 if(isset($_REQUEST['layout']) && $_REQUEST['layout'] == 'aligned-weekdays') {
@@ -185,12 +187,11 @@ if(isset($_REQUEST['layout']) && $_REQUEST['layout'] == 'aligned-weekdays') {
 	while($day <= 42) {
 		echo '<tr>';
 		// Start the inner loop around 12 months
-		while($month <= 12) {
+		while($month <= $month_last) {
 			if($dates[$month][$day] == 0) {
 				echo '<td></td>';
 			}
 			else {
-				
 				$date = date('Y', $now).'-'.str_pad($month, 2, '0', STR_PAD_LEFT).'-'.str_pad($dates[$month][$day], 2, '0', STR_PAD_LEFT);
 				if(date('N', strtotime($date)) == '7') {
 					echo '<td class="weekend">';
@@ -204,10 +205,9 @@ if(isset($_REQUEST['layout']) && $_REQUEST['layout'] == 'aligned-weekdays') {
 			$month++;
 		}
 		echo '</tr>';
-		$month = 1;
+		$month = $month_first;
 		$day++;
 	}
-	
 }
 
 else {
@@ -215,7 +215,7 @@ else {
 	while($day <= 31) {
 		echo '<tr>';
 		// Start the inner loop around 12 months
-		while($month <= 12) {
+		while($month <= $month_last) {
 			// If we’ve reached a point in the date matrix where the resulting date would be invalid (e.g. February 30th), leave the cell blank
 			if($day > cal_days_in_month(CAL_GREGORIAN, $month, date('Y', $now))) {
 				echo '<td></td>';
@@ -235,7 +235,7 @@ else {
 			$month++;
 		}
 		echo '</tr>';
-		$month = 1;
+		$month = $month_first;
 		$day++;
 	}
 }

@@ -79,7 +79,7 @@ td:empty {
 	color: #888;
 }
 .weekend {
-	background: #eee;
+	background: #d8d8d8;
 	font-weight: 400;
 }
 p {

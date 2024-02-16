@@ -68,6 +68,10 @@ th {
 td:empty {
 	border: 0;
 }
+.weeknumber {
+	width: 1.1em;
+	padding-right: 0;
+}
 .date {
 	display: inline-block;
 	width: 1.1em;
@@ -131,7 +135,7 @@ echo '<thead>';
 echo '<tr>';
 // Add the month headings
 for($i = 1; $i <= 12; $i++) {
-	echo '<th>'.DateTime::createFromFormat('!m', $i)->format('M').'</th>';
+	echo '<th colspan=2>'.DateTime::createFromFormat('!m', $i)->format('M').'</th>';
 }
 echo '</tr>';
 echo '</thead>';
@@ -217,20 +221,31 @@ else {
 		// Start the inner loop around 12 months
 		while($month <= 12) {
 			// If we’ve reached a point in the date matrix where the resulting date would be invalid (e.g. February 30th), leave the cell blank
-			if($day > cal_days_in_month(CAL_GREGORIAN, $month, date('Y', $now))) {
-				echo '<td></td>';
+			$days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, date('Y', $now));
+			if($day > $days_in_month) {
+				echo '<td colspan=2></td>';
 				$month++;
 				continue;
 			}
+
+			$date = DateTime::createFromFormat("!Y-m-d", date("Y", $now)."-".$month."-".$day);
+
+			if ($day == 1) {
+				echo '<td class="weeknumber" rowspan='.(8-$date->format('N')).'>'.$date->format('W').'</td>';
+			} elseif ($date->format("N") == 1) {
+				$rowspan = min(7, $days_in_month - $day + 1);
+				echo '<td class="weeknumber" rowspan='.$rowspan.'>'.$date->format('W').'</td>';
+			}
+
 			// If the day falls on a weekend, apply a specific class for styles
-			if(DateTime::createFromFormat('!Y-m-d', date('Y', $now).'-'.$month.'-'.$day)->format('N') == 6 || DateTime::createFromFormat('!Y-m-d', date('Y', $now).'-'.$month.'-'.$day)->format('N') == 7) {
+			if($date->format("N") == 6 || $date->format("N") == 7) {
 				echo '<td class="weekend">';
 			}
 			else {
 				echo '<td>';
 			}
 			// Display the day number and day of the week
-			echo '<span class="date">'.$day.'</span> <span class="day">'.substr(DateTime::createFromFormat('!Y-m-d', date('Y', $now).'-'.$month.'-'.$day)->format('D'), 0, 1).'</span>';
+			echo '<span class="date">'.$day.'</span> <span class="day">'.substr($date->format('D'), 0, 1).'</span>';
 			echo '</td>';
 			$month++;
 		}

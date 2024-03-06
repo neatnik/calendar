@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>日历</title>
+    <meta name="description" content="一页日历，可用于打印" />
+    <style>
+      html,
+      body {
+        font-family: monospace, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 0.5em 0;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        height: calc(100% - 2.5em);
+        border-collapse: separate;
+        border-spacing: 0.5em 0;
+      }
+      td,
+      th {
+        font-weight: normal;
+        text-transform: uppercase;
+        border-bottom: 1px solid #888;
+        padding: 0.3vmin 0.3vmin;
+        font-size: 0.9vmin;
+        font-weight: 300;
+        color: #000;
+      }
+      th {
+        font-size: 1.1vmin;
+        padding: 0;
+      }
+      td:empty {
+        border: 0;
+      }
+      .date {
+        display: inline-block;
+        width: 1.6em;
+      }
+      .week {
+        display: inline-block;
+        text-align: center;
+        width: 1em;
+        color: #888;
+      }
+      .weekend {
+        background: #eee;
+        font-weight: 400;
+      }
+      @media print {
+        #info {
+          display: none;
+        }
+      }
+      #info {
+        font-family: 'Inter', sans-serif;
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 5em 2em;
+        width: calc(100% - 6em);
+        background: #333;
+        color: #eee;
+        padding: 1em 1em 0.5em 1em;
+        font-size: 2vmax;
+        border-radius: 0.2em;
+      }
+      #info p {
+        text-align: left;
+        margin: 0 0 1em 0;
+        line-height: 135%;
+      }
+      #info a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="info">
+      <p>
+        如果你打印这一页，会得到一个漂亮的日历，在一页上显示所有的日期。它将自适应任何尺寸的单张纸。为了获得最佳效果，请将打印设置调整为横向，并禁用页眉和页脚。
+      </p>
+      <p>一次把一年都放进去，折起来随身携带，记下你的笔记。计划好事情，观察时间的流逝。最重要的是，善待他人。</p>
+      <p>
+        Made by <a href="https://neatnik.net/">Neatnik</a> · Translate by
+        <a href="https://github.com/myway42">myway42</a>
+      </p>
+    </div>
+    <h1></h1>
+    <table>
+      <thead>
+        <tr>
+          <th>1月</th>
+          <th>2月</th>
+          <th>3月</th>
+          <th>4月</th>
+          <th>5月</th>
+          <th>6月</th>
+          <th>7月</th>
+          <th>8月</th>
+          <th>9月</th>
+          <th>10月</th>
+          <th>11月</th>
+          <th>12月</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      const WEEK = ['日', '一', '二', '三', '四', '五', '六']
+      const url = new URL(window.location)
+      // 自定义年份
+      const currentYear = url.searchParams.get('year') ? url.searchParams.get('year') : new Date().getFullYear()
+      // 是否隐藏星期
+      const hideWeek = url.searchParams.get('hideWeek')
+      const days = []
+      let month = 0
+      while (month < 12) {
+        days[month] = new Array(new Date(currentYear, month + 1, 0).getDate())
+        let dayLength = days[month].length
+        let day = 0
+        while (day < dayLength) {
+          let weekNum = new Date(currentYear, month, day + 1).getDay()
+          days[month][day] = `
+            <td class=${weekNum < 2 && 'weekend'}>
+              <span class='date'>${day + 1}</span>
+              ${hideWeek ? '' : "<span class='week'>" + WEEK[weekNum] + '</span>'}
+            </td>`
+          day++
+        }
+        month++
+      }
+      const title = document.querySelector('h1')
+      const tBody = document.querySelector('tbody')
+      title.innerText = currentYear
+      let content = ''
+      let col = 0
+      while (col < 31) {
+        let trContent = ''
+        let row = 0
+        while (row < 12) {
+          trContent += `${days[row][col] ? days[row][col] : '<td></td>'}`
+          row++
+        }
+        content += `
+        <tr>
+          ${trContent}
+        </tr>`
+        col++
+      }
+      tBody.innerHTML = content
+      // 更换日期字体颜色
+      const dayColor = url.searchParams.get('dayColor')
+      if (dayColor) {
+        document.querySelector('h1').style.color = dayColor
+        document.querySelectorAll('th').forEach((item) => {
+          item.style.color = dayColor
+          return item
+        })
+        document.querySelectorAll('td').forEach((item) => {
+          item.style.color = dayColor
+          return item
+        })
+      }
+    </script>
+  </body>
+</html>
